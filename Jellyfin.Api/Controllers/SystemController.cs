@@ -172,7 +172,6 @@ namespace Jellyfin.Api.Controllers
         /// <response code="200">Information retrieved.</response>
         /// <returns><see cref="EndPointInfo"/> with information about the endpoint.</returns>
         [HttpGet("Endpoint")]
-        [Authorize(Policy = Policies.DefaultAuthorization)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<EndPointInfo> GetEndpointInfo()
         {
