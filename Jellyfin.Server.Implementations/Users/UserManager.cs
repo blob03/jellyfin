@@ -259,9 +259,12 @@ namespace Jellyfin.Server.Implementations.Users
         }
 
         /// <inheritdoc/>
-        public Task ResetEasyPassword(User user)
+        public async Task ResetEasyPassword(User user)
         {
-            return ChangeEasyPassword(user, string.Empty, null);
+            user.EasyPassword = System.String.Empty;
+            await UpdateUserAsync(user).ConfigureAwait(false);
+
+            await _eventManager.PublishAsync(new UserPasswordChangedEventArgs(user)).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -810,14 +813,20 @@ namespace Jellyfin.Server.Implementations.Users
 
             if (!success
                 && _networkManager.IsInLocalNetwork(remoteEndPoint)
-                && user?.EnableLocalPassword == true
-                && !string.IsNullOrEmpty(user.EasyPassword))
+                && user?.EnableLocalPassword == true)
             {
-                // Check easy password
-                var passwordHash = PasswordHash.Parse(user.EasyPassword);
-                success = _cryptoProvider.Verify(passwordHash, password);
-            }
-
+				if (!string.IsNullOrEmpty(user.EasyPassword)) {
+					// Check easy password
+					var passwordHash = PasswordHash.Parse(user.EasyPassword);
+					success = _cryptoProvider.Verify(passwordHash, password);
+				} else {
+					// If the request comes from a local network,
+					// and the 'EnableLocalPassword' feature has been activated
+					// and no Easy password has been configured 
+					// then we just grant access.
+					success = true;
+				}
+			}
             return (authenticationProvider, username, success);
         }
 
