@@ -1,3 +1,8 @@
+<h2 align="center">That repository is no longer maintained</h2>
+<h2 align="center">New home is located at https://bitbucket.org/myjelly/workspace/overview/</h2>
+</br>
+</br>
+
 <h1 align="center">Jellyfin</h1>
 <h3 align="center">The Free Software Media System</h3>
 
